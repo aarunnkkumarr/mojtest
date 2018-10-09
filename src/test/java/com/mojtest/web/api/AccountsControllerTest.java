@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,6 +23,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojtest.exception.AccountException;
 import com.mojtest.model.Account;
 import com.mojtest.service.AccountsService;
@@ -35,6 +37,9 @@ public class AccountsControllerTest {
 
 	@MockBean
 	private AccountsService accountsService;
+
+	@Autowired
+	private ObjectMapper mapper;
 
 	@Test
 	public void should_ReturnAllValidAccounts_Json() throws Exception {
@@ -78,11 +83,24 @@ public class AccountsControllerTest {
 	@Test
 	public void should_Delete_CorrectAccount_Successfully() throws Exception {
 		// ARRANGE
- 		doThrow(IllegalArgumentException.class).when(accountsService).deleteAccount(null);
+		doThrow(IllegalArgumentException.class).when(accountsService).deleteAccount(null);
 		// ACT AND ASSSERT
 		mvc.perform(delete("/account-project/rest/account/json/1").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("account successfully deleted"));
+
+	}
+
+	@Test
+	public void should_CreateNewAccount_Return_Success_Message() throws Exception {
+
+		Account account_1 = createTestAccount(1, "John", "Woo", "12346");
+		String json = mapper.writeValueAsString(account_1);
+
+		when(accountsService.createAccount(account_1)).thenReturn(account_1);
+		mvc.perform(post("/account-project/rest/account/json").contentType(MediaType.APPLICATION_JSON).content(json)
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("account has been successfully added"));
 
 	}
 
