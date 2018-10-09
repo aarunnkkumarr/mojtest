@@ -29,4 +29,8 @@ public class AccountsServiceImpl implements AccountsService {
 		throw new RuntimeException("Account doesn't Exist");
 	}
 
+	@Override
+	public void deleteAccount(Integer id) {
+		accountRepository.deleteById(id);
+	}
 }

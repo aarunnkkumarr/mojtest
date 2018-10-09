@@ -1,6 +1,8 @@
 package com.mojtest.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -87,6 +90,14 @@ public class AccountsServiceImplTest {
 		when(accountRepository.findById(account_1.getId())).thenReturn(Optional.of(account_1));
 		// ACT
 		accountsService.getAccountById(2);
+	}
+	
+	@Test
+	public void should_DeleteAccount_IfAccountExist() {
+		accountsService.deleteAccount(1);
+		ArgumentCaptor<Integer> arg = ArgumentCaptor.forClass(Integer.class);
+		verify(accountRepository, times(1)).deleteById(arg.capture());
+		assertThat(arg.getValue()).isEqualTo(1);
 	}
 
 }
