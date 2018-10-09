@@ -2,7 +2,9 @@ package com.mojtest.web.api;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,6 +20,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.mojtest.exception.AccountException;
 import com.mojtest.model.Account;
@@ -48,28 +51,38 @@ public class AccountsControllerTest {
 				.andExpect(jsonPath("$[0].firstName", is(account_1.getFirstName())));
 
 	}
-	
+
 	@Test
 	public void should_Return_CorrectAccount_On_RetrivalById() throws Exception {
 		// ARRANGE
-		Account account_1 = createTestAccount(1,"John", "Doe", "12345");
+		Account account_1 = createTestAccount(1, "John", "Doe", "12345");
 
 		when(accountsService.getAccountById(1)).thenReturn(account_1);
 
 		// ACT AND ASSSERT
 		mvc.perform(get("/account-project/rest/account/json/1").contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.firstName", is(account_1.getFirstName())));
+				.andExpect(status().isOk()).andExpect(jsonPath("$.firstName", is(account_1.getFirstName())));
 	}
-	
+
 	@Test
 	public void should_Return_Error_When_Account_Does_Not_Exist() throws Exception {
-		//ARRANGE
+		// ARRANGE
 		when(accountsService.getAccountById(12)).thenThrow(new AccountException("Account number Already Exist"));
 		// ACT AND ASSSERT
 		mvc.perform(get("/account-project/rest/account/json/12").contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isBadRequest())
+				.andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.message", is("Account number Already Exist")));
+
+	}
+
+	@Test
+	public void should_Delete_CorrectAccount_Successfully() throws Exception {
+		// ARRANGE
+ 		doThrow(IllegalArgumentException.class).when(accountsService).deleteAccount(null);
+		// ACT AND ASSSERT
+		mvc.perform(delete("/account-project/rest/account/json/1").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("account successfully deleted"));
 
 	}
 
