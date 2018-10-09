@@ -2,6 +2,9 @@ package com.mojtest.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.validation.ConstraintViolationException;
 
 import org.junit.Test;
@@ -72,6 +75,23 @@ public class AccountRepositoryTest {
 		assertThat(accountRepository.findAll().size()).isEqualTo(1);
 	}
 
+	@Test
+	public void should_ReturnAllAccounts() {
+		// given
+		Account account_1 = createTestAccount("John","Doe","12345");
+		Account account_2 = createTestAccount("John1","Doe1","12346");
+		Account account_3 = createTestAccount("Alex","Couper","12347");
+		// when
+		List<Account> accounts = accountRepository.findAll();
+		//assert
+		assertThat(accounts.size()).isEqualTo(3);
+		
+		List<String> accountNumbers =accounts.stream().map(a -> a.getAccountNumber()).collect(Collectors.toList());
+		
+		assertThat(accountNumbers.contains(account_1.getAccountNumber()));
+		assertThat(accountNumbers.contains(account_2.getAccountNumber()));
+		assertThat(accountNumbers.contains(account_3.getAccountNumber()));
+	}
 	private Account createTestAccount(String firstName, String secondName, String accountNumber) {
 		Account account = new Account();
 		account.setFirstName(firstName);
