@@ -1,4 +1,4 @@
-package com.example.mojtest;
+package com.mojtest;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
