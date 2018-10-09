@@ -33,4 +33,10 @@ public class AccountsServiceImpl implements AccountsService {
 	public void deleteAccount(Integer id) {
 		accountRepository.deleteById(id);
 	}
+
+	@Override
+	public Account createAccount(Account account) {
+		Account savedAccount = accountRepository.save(account);
+		return savedAccount;
+	}
 }

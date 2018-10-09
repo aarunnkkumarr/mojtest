@@ -82,7 +82,7 @@ public class AccountsServiceImplTest {
 		assertThat(actual.getFirstName()).isEqualTo(account_1.getFirstName());
 		assertThat(actual.getSecondName()).isEqualTo(account_1.getSecondName());
 	}
-	
+
 	@Test(expected = RuntimeException.class)
 	public void should_ThrowException_WhenAccountDoesNotExist() {
 		// ARRANGE
@@ -91,13 +91,24 @@ public class AccountsServiceImplTest {
 		// ACT
 		accountsService.getAccountById(2);
 	}
-	
+
 	@Test
 	public void should_DeleteAccount_IfAccountExist() {
 		accountsService.deleteAccount(1);
 		ArgumentCaptor<Integer> arg = ArgumentCaptor.forClass(Integer.class);
 		verify(accountRepository, times(1)).deleteById(arg.capture());
 		assertThat(arg.getValue()).isEqualTo(1);
+	}
+
+	@Test
+	public void should_CreateAccount() {
+		Account account_1 = createTestAccount(1, "John", "Doe", "123450");
+		when(accountRepository.save(account_1)).thenReturn(account_1);
+		Account createdAccount = accountsService.createAccount(account_1);
+		assertThat(createdAccount.getAccountNumber()).isEqualTo(account_1.getAccountNumber());
+		assertThat(createdAccount.getFirstName()).isEqualTo(account_1.getFirstName());
+		assertThat(createdAccount.getSecondName()).isEqualTo(account_1.getSecondName());
+
 	}
 
 }
