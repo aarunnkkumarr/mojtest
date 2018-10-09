@@ -5,8 +5,10 @@ import java.util.Collection;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mojtest.exception.AccountException;
 import com.mojtest.model.Account;
 import com.mojtest.service.AccountsService;
@@ -55,4 +56,14 @@ public class AccountsController {
 		return new ResponseEntity<>(new ApiError(accountExcpetion.getMessage(), accountExcpetion.getMessage()),
 				HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(MethodArgumentNotValidException.class )
+    public ResponseEntity<ApiError> handleException(MethodArgumentNotValidException argumentNotValidException) {
+		return new ResponseEntity<>(new ApiError("Please enter a valid value", argumentNotValidException.getMessage()),HttpStatus.BAD_REQUEST);
+    }
+	
+	@ExceptionHandler(DataAccessException.class )
+    public ResponseEntity<ApiError> handleException(DataAccessException dataAccessException) {
+		return new ResponseEntity<>(new ApiError(dataAccessException.getMessage(), dataAccessException.getMessage()),HttpStatus.BAD_REQUEST);
+    }
 }

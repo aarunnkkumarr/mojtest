@@ -15,9 +15,11 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -101,6 +103,31 @@ public class AccountsControllerTest {
 		mvc.perform(post("/account-project/rest/account/json").contentType(MediaType.APPLICATION_JSON).content(json)
 				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 				.andExpect(MockMvcResultMatchers.jsonPath("$.message").value("account has been successfully added"));
+
+	}
+
+	@Test
+	public void should_CreateNewAccount_Return_Failure_Message_If_FirstName_Is_Blank() throws Exception {
+
+		Account account_1 = createTestAccount(1, "", "Woo", "12346");
+		String json = mapper.writeValueAsString(account_1);
+
+		when(accountsService.createAccount(account_1)).thenReturn(account_1);
+		mvc.perform(post("/account-project/rest/account/json").contentType(MediaType.APPLICATION_JSON).content(json)
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
+
+	}
+
+	@Test
+	public void should_CreateNewAccount_Return_Failure_Message_If_Account_Already_Exist() throws Exception {
+
+		Account account_1 = createTestAccount(1, "John", "Woo", "12346");
+		String json = mapper.writeValueAsString(account_1);
+
+		when(accountsService.createAccount(Mockito.any(Account.class)))
+				.thenThrow(new DataIntegrityViolationException("Duplicate Account Number"));
+		mvc.perform(post("/account-project/rest/account/json").contentType(MediaType.APPLICATION_JSON).content(json)
+				.accept(MediaType.APPLICATION_JSON)).andExpect(status().isBadRequest());
 
 	}
 
