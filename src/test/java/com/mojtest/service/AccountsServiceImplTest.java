@@ -5,6 +5,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,6 +55,13 @@ public class AccountsServiceImplTest {
 		List<String> accountNumbers = accounts.stream().map(a -> a.getAccountNumber()).collect(Collectors.toList());
 		List<String> actualAccountNumbers = actual.stream().map(a -> a.getAccountNumber()).collect(Collectors.toList());
 		assertThat(accountNumbers.containsAll(actualAccountNumbers)).isTrue();
+	}
+
+	@Test
+	public void should_Return_EmptyList_If_No_AccountsExists() {
+		when(accountRepository.findAll()).thenReturn((Collections.emptyList()));
+		Collection<Account> actual = accountsService.getAllAccounts();
+		assertThat(actual).isEmpty();
 	}
 
 }
