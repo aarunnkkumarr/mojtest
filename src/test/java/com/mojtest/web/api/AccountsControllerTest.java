@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.mojtest.exception.AccountException;
 import com.mojtest.model.Account;
 import com.mojtest.service.AccountsService;
 
@@ -59,6 +60,17 @@ public class AccountsControllerTest {
 		mvc.perform(get("/account-project/rest/account/json/1").contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.firstName", is(account_1.getFirstName())));
+	}
+	
+	@Test
+	public void should_Return_Error_When_Account_Does_Not_Exist() throws Exception {
+		//ARRANGE
+		when(accountsService.getAccountById(12)).thenThrow(new AccountException("Account number Already Exist"));
+		// ACT AND ASSSERT
+		mvc.perform(get("/account-project/rest/account/json/12").contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.message", is("Account number Already Exist")));
+
 	}
 
 	private Account createTestAccount(int id, String firstName, String secondName, String accountNumber) {
