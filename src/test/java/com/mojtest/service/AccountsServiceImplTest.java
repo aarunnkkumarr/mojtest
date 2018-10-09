@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
@@ -62,6 +63,30 @@ public class AccountsServiceImplTest {
 		when(accountRepository.findAll()).thenReturn((Collections.emptyList()));
 		Collection<Account> actual = accountsService.getAllAccounts();
 		assertThat(actual).isEmpty();
+	}
+
+	@Test
+	public void should_Return_CorrectAccount_WhenAvailable() {
+		// ARRANGE
+		Account account_1 = createTestAccount(1, "John", "Doe", "123450");
+		when(accountRepository.findById(account_1.getId())).thenReturn(Optional.of(account_1));
+
+		// ACT
+		Account actual = accountsService.getAccountById(1);
+
+		// ASSERT
+		assertThat(actual.getAccountNumber()).isEqualTo(account_1.getAccountNumber());
+		assertThat(actual.getFirstName()).isEqualTo(account_1.getFirstName());
+		assertThat(actual.getSecondName()).isEqualTo(account_1.getSecondName());
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void should_ThrowException_WhenAccountDoesNotExist() {
+		// ARRANGE
+		Account account_1 = createTestAccount(1, "John", "Doe", "123450");
+		when(accountRepository.findById(account_1.getId())).thenReturn(Optional.of(account_1));
+		// ACT
+		accountsService.getAccountById(2);
 	}
 
 }
