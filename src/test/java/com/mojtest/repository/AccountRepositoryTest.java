@@ -51,6 +51,16 @@ public class AccountRepositoryTest {
 		accountRepository.save(account);
 	}
 
+	@Test
+	public void should_ReturnValidAccount_ById() {
+		// given
+		Account account = createTestAccount("John", "Doe", "12345");
+		// when
+		Account found = accountRepository.findById(account.getId()).orElse(null);
+		//assert
+		assertThat(found.getFirstName()).isEqualTo(account.getFirstName());
+	}
+
 	private Account createTestAccount(String firstName, String secondName, String accountNumber) {
 		Account account = new Account();
 		account.setFirstName(firstName);
