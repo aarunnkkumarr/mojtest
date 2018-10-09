@@ -2,6 +2,8 @@ package com.mojtest.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import javax.validation.ConstraintViolationException;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,18 @@ public class AccountRepositoryTest {
 		Account accountCreated = accountRepository.save(account);
 		// Assert
 		assertThat(accountCreated.getFirstName()).isEqualTo(account.getFirstName());
+	}
+	
+	
+	@Test(expected=ConstraintViolationException.class)
+	public void should_Not_Create_An_AccountThat_AlreadyExist() {
+		// given
+		Account account = createTestAccount("","Doe","12345");
+		// when
+	    accountRepository.save(account);
+		entityManager.flush();
+	    accountRepository.save(account);
+		entityManager.flush();
 	}
 
 	private Account createTestAccount(String firstName, String secondName, String accountNumber) {
