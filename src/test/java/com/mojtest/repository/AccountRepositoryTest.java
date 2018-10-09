@@ -57,8 +57,19 @@ public class AccountRepositoryTest {
 		Account account = createTestAccount("John", "Doe", "12345");
 		// when
 		Account found = accountRepository.findById(account.getId()).orElse(null);
-		//assert
+		// assert
 		assertThat(found.getFirstName()).isEqualTo(account.getFirstName());
+	}
+
+	@Test
+	public void should_DeletedAccount_ById() {
+		// given
+		@SuppressWarnings("unused")
+		Account account_1 = createTestAccount("John", "Doe", "12345");
+		Account account_2 = createTestAccount("John1", "Doe1", "12346");
+		// when
+		accountRepository.deleteById(account_2.getId());
+		assertThat(accountRepository.findAll().size()).isEqualTo(1);
 	}
 
 	private Account createTestAccount(String firstName, String secondName, String accountNumber) {
