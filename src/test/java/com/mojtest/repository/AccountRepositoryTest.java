@@ -31,17 +31,24 @@ public class AccountRepositoryTest {
 		// Assert
 		assertThat(accountCreated.getFirstName()).isEqualTo(account.getFirstName());
 	}
-	
-	
-	@Test(expected=ConstraintViolationException.class)
+
+	@Test(expected = ConstraintViolationException.class)
 	public void should_Not_Create_An_AccountThat_AlreadyExist() {
 		// given
-		Account account = createTestAccount("","Doe","12345");
+		Account account = createTestAccount("", "Doe", "12345");
 		// when
-	    accountRepository.save(account);
+		accountRepository.save(account);
 		entityManager.flush();
-	    accountRepository.save(account);
+		accountRepository.save(account);
 		entityManager.flush();
+	}
+
+	@Test(expected = ConstraintViolationException.class)
+	public void should_Not_Create_An_AccountThat_Has_No_FirstName() {
+		// given
+		Account account = createTestAccount("", "Doe", "12345");
+		// when
+		accountRepository.save(account);
 	}
 
 	private Account createTestAccount(String firstName, String secondName, String accountNumber) {
