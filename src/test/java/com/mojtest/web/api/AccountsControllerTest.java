@@ -47,6 +47,19 @@ public class AccountsControllerTest {
 				.andExpect(jsonPath("$[0].firstName", is(account_1.getFirstName())));
 
 	}
+	
+	@Test
+	public void should_Return_CorrectAccount_On_RetrivalById() throws Exception {
+		// ARRANGE
+		Account account_1 = createTestAccount(1,"John", "Doe", "12345");
+
+		when(accountsService.getAccountById(1)).thenReturn(account_1);
+
+		// ACT AND ASSSERT
+		mvc.perform(get("/account-project/rest/account/json/1").contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.firstName", is(account_1.getFirstName())));
+	}
 
 	private Account createTestAccount(int id, String firstName, String secondName, String accountNumber) {
 		Account account = new Account();
